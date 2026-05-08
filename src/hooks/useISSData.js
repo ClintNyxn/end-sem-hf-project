@@ -14,7 +14,8 @@ export function useISSData() {
 
   const fetchAstronauts = useCallback(async () => {
     try {
-      const res = await fetch('http://api.open-notify.org/astros.json');
+      // Using an HTTPS proxy to fetch open-notify data without Mixed Content errors
+      const res = await fetch('https://api.allorigins.win/raw?url=http://api.open-notify.org/astros.json');
       const data = await res.json();
       setAstronauts({ count: data.number, people: data.people });
     } catch (err) {
@@ -24,8 +25,10 @@ export function useISSData() {
 
   const fetchISSLocation = useCallback(async () => {
     try {
-      const res = await fetch('http://api.open-notify.org/iss-now.json');
+      // Using an HTTPS proxy to fetch open-notify data to fix Mixed Content and format issues
+      const res = await fetch('https://api.allorigins.win/raw?url=http://api.open-notify.org/iss-now.json');
       const data = await res.json();
+      
       const newPos = {
         lat: parseFloat(data.iss_position.latitude),
         lng: parseFloat(data.iss_position.longitude),
@@ -52,9 +55,11 @@ export function useISSData() {
       });
 
       setLoading(false);
+      setError(null);
     } catch (err) {
+      console.error("ISS Fetch Error:", err);
       setError("Failed to track ISS. Check your connection.");
-      setLoading(false);
+      // Don't set loading false immediately if we have a previous position to show
     }
   }, []);
 
